@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios'
 
-function App() {
+// Add progress bar
+// open article in lightbox
+
+export default function App() {
+
+  const [hits, setHits] = useState([])
+  const [query, setQuery] = useState('reacthooks')
+
+  useEffect(() => {
+   fetchData()
+  // eslint-disable-next-line 
+  }, [])
+
+  const fetchData = async () => {
+    const res = await axios.get(`http://hn.algolia.com/api/v1/search?query=${query}`)
+    setHits(res.data.hits)
+
+  }
+
+const handleSubmit = (e) => {
+  e.preventDefault()
+  fetchData()
+}
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+   <div className="container">
+     <form onSubmit={handleSubmit}>
+       <input type="text" name="search" value={query} onChange={e => setQuery(e.target.value)} />
+       <input type="submit" value="Submit" />
+     </form>
+   <ul className="articles">
+    {
+     hits.map(hit => (
+       <li className="item" key={hit.objectID}>
+         <a href={hit.url} target="_blank" rel="noreferrer">{hit.title}</a>
+       </li>
+     )) 
+    }
+    </ul>
+   </div>
   );
 }
 
-export default App;
+
